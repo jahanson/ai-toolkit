@@ -1,0 +1,60 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Scrape Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Scrape Docker daemon metrics (if enabled on port 9323)
+  - job_name: 'docker'
+    dockerswarm_sd_configs:
+      - host: unix:///var/run/docker.sock
+        role: nodes
+    relabel_configs:
+      - source_labels: [__meta_dockerswarm_node_address]
+        target_label: __address__
+        replacement: $1:9323
+
+  # Scrape all Docker Swarm containers with the 'prometheus-job' label
+  - job_name: 'dockerswarm'
+    dockerswarm_sd_configs:
+      - host: unix:///var/run/docker.sock
+        role: tasks
+    relabel_configs:
+      - source_labels: [__meta_dockerswarm_task_desired_state]
+        regex: running
+        action: keep
+      - source_labels: [__meta_dockerswarm_service_label_prometheus_job]
+        regex: .+
+        action: keep
+      - regex: __meta_dockerswarm_service_label_prometheus_(.+)
+        action: labelmap
+        replacement: $1
+
+  # Scrape n8n metrics (ensure N8N_METRICS=true and port 5678 is accessible)
+  - job_name: 'n8n'
+    static_configs:
+      - targets: ['n8n:5678']
+
+  # Scrape cAdvisor (if deployed as a global service on port 8080)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # Example: Scrape Langfuse (adjust port if needed)
+  - job_name: 'langfuse'
+    static_configs:
+      - targets: ['langfuse:3000']
+
+  # Example: Scrape Qdrant (adjust port if needed)
+  - job_name: 'qdrant'
+    static_configs:
+      - targets: ['qdrant:6333']
+
+  # Example: Scrape Ollama Monitor (if you run a Prometheus exporter for Ollama on port 8000)
+  - job_name: 'ollama-monitor'
+    static_configs:
+      - targets: ['ollama-monitor:8000']
