@@ -50,7 +50,6 @@ services:
       - pgdata_n8n:/var/lib/postgresql/data
     secrets: [postgres_n8n_password]
     networks: [internal]
-    restart: unless-stopped
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
@@ -71,7 +70,6 @@ services:
       - pgdata_langfuse:/var/lib/postgresql/data
     secrets: [postgres_langfuse_password]
     networks: [internal]
-    restart: unless-stopped
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
@@ -112,7 +110,6 @@ services:
         export DB_POSTGRESDB_PASSWORD="$$(cat /run/secrets/postgres_n8n_password)";
         exec /docker-entrypoint.sh n8n'
     networks: [internal]
-    restart: unless-stopped
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-fsSL", "http://localhost:5678/health"]
@@ -129,7 +126,6 @@ services:
     volumes:
       - qdrant_storage:/qdrant/storage
     networks: [internal]
-    restart: unless-stopped
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-fsSL", "http://localhost:6333/healthz"]
@@ -147,7 +143,6 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     networks: [internal]
-    restart: unless-stopped
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
@@ -179,7 +174,6 @@ services:
         export DATABASE_URL="postgres://langfuse:$$(cat /run/secrets/postgres_langfuse_password)@postgres_langfuse:5432/langfuse";
         exec /entrypoint.sh'
     networks: [internal]
-    restart: unless-stopped
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-fsSL", "http://localhost:3000/api/health"]
