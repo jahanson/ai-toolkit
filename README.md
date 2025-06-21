@@ -20,14 +20,16 @@ A Docker Swarm stack configuration for AI automation and workflow management.
 
 ## Quick Start
 
-1. Create the secrets:
+1. Create the secrets retrieving them from 1password:
    ```bash
-   docker secret create n8n_basic_auth_user ./secrets/n8n_user
-   docker secret create n8n_basic_auth_password ./secrets/n8n_pass
-   docker secret create n8n_encryption_key ./secrets/n8n_enc
-   docker secret create langfuse_nextauth_secret ./secrets/langfuse_nextauth
-   docker secret create postgres_password ./secrets/postgres_pass
-   docker secret create postgres_langfuse_password ./secrets/postgres_langfuse_pass
+   mise run "bootstrap:secrets"
+   # OR
+   op read op://ai-toolkit/n8n_basic_auth_user/password | docker secret create n8n_basic_auth_user -
+   op read op://ai-toolkit/n8n_basic_auth_password/password | docker secret create n8n_basic_auth_password -
+   op read op://ai-toolkit/n8n_encryption_key/password | docker secret create n8n_encryption_key -
+   op read op://ai-toolkit/langfuse_nextauth_secret/password | docker secret create langfuse_nextauth_secret -
+   op read op://ai-toolkit/postgres_n8n_password/password | docker secret create postgres_n8n_password -
+   op read op://ai-toolkit/postgres_langfuse_password/password | docker secret create postgres_langfuse_password -
    ```
 
 2. Create prometheus config:
