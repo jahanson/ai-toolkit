@@ -130,40 +130,6 @@ services:
       resources:
         limits: {cpus: "2.0", memory: 4g}
 
-  # ---------------------------------------------------------------------------
-  # Llama‑Guard – safety classifier
-  # ---------------------------------------------------------------------------
-  llama-guard:
-    image: ghcr.io/meta-llama/llama-guard:4
-    ports: ["8080:8080"]
-    environment:
-      MODEL_NAME: "LlamaGuard-12b"
-    networks: [internal]
-    restart: unless-stopped
-    healthcheck:
-      <<: *default-healthcheck
-      test: ["CMD", "curl", "-fsSL", "http://localhost:8080/health"]
-    deploy:
-      resources:
-        limits: {cpus: "2.0", memory: 6g}
-
-  # ---------------------------------------------------------------------------
-  # Nomic‑Embed – embeddings API
-  # ---------------------------------------------------------------------------
-  nomic-embed:
-    image: ghcr.io/nomic-ai/nomic-embed-text:v1.5
-    ports: ["9000:9000"]
-    environment:
-      MODEL_ID: "text-embedding-3-small"
-      NUM_THREADS: "8"
-    networks: [internal]
-    restart: unless-stopped
-    healthcheck:
-      <<: *default-healthcheck
-      test: ["CMD", "curl", "-fsSL", "http://localhost:9000/health"]
-    deploy:
-      resources:
-        limits: {cpus: "2.0", memory: 6g}
 
   # ---------------------------------------------------------------------------
   # Prometheus – metrics scraper
