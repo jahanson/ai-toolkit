@@ -10,7 +10,7 @@ x-healthcheck: &default-healthcheck
 
 networks:
   internal:
-    driver: bridge
+    driver: overlay
 
 volumes:
   n8n_storage:
@@ -23,12 +23,18 @@ volumes:
 # Docker Secrets – keep credentials out of the compose file.
 # -----------------------------------------------------------------------------
 secrets:
-  n8n_basic_auth_user:        {file: ./secrets/n8n_user}
-  n8n_basic_auth_password:    {file: ./secrets/n8n_pass}
-  n8n_encryption_key:         {file: ./secrets/n8n_enc}
-  langfuse_nextauth_secret:   {file: ./secrets/langfuse_nextauth}
-  postgres_n8n_password:          {file: ./secrets/postgres_n8n_pass}
-  postgres_langfuse_password: {file: ./secrets/postgres_langfuse_pass}
+  n8n_basic_auth_user:
+    external: true
+  n8n_basic_auth_password:
+    external: true
+  n8n_encryption_key:
+    external: true
+  langfuse_nextauth_secret:
+    external: true
+  postgres_n8n_password:
+    external: true
+  postgres_langfuse_password:
+    external: true
 
 services:
   # ---------------------------------------------------------------------------
@@ -95,14 +101,15 @@ services:
     volumes:
       - n8n_storage:/home/node/.n8n
     depends_on:
-      postgres_n8n: {condition: service_healthy}
-      qdrant:   {condition: service_healthy}
-    secrets: [postgres_password]
+      - postgres_n8n
+      - qdrant
+    secrets:
+      - postgres_n8n_password
     extra_hosts:
       - "host.docker.internal:host-gateway"  # reach host‑side Ollama
     entrypoint: >
       /bin/sh -c '
-        export DB_POSTGRESDB_PASSWORD="$(cat /run/secrets/postgres_password)";
+        export DB_POSTGRESDB_PASSWORD="$$(cat /run/secrets/postgres_n8n_password)";
         exec /docker-entrypoint.sh n8n'
     networks: [internal]
     restart: unless-stopped
@@ -164,12 +171,12 @@ services:
       - langfuse_nextauth_secret
       - postgres_langfuse_password
     depends_on:
-      postgres_langfuse: {condition: service_healthy}
+      - postgres_langfuse
     extra_hosts:
       - "host.docker.internal:host-gateway"  # reach host‑side Ollama
     entrypoint: >
       /bin/sh -c '
-        export DATABASE_URL="postgres://langfuse:$(cat /run/secrets/postgres_langfuse_password)@postgres_langfuse:5432/langfuse";
+        export DATABASE_URL="postgres://langfuse:$$(cat /run/secrets/postgres_langfuse_password)@postgres_langfuse:5432/langfuse";
         exec /entrypoint.sh'
     networks: [internal]
     restart: unless-stopped
