@@ -2,15 +2,21 @@
 
 A Docker Swarm stack configuration for AI automation and workflow management.
 
+> **Notice:**  
+> This project is a work in progress and subject to significant changes.
+
 ## Services
 
 - **n8n** (5678) - Workflow automation
 - **Langfuse** (3000) - LLM observability  
 - **Qdrant** (6333) - Vector database
 - **Prometheus** (9090) - Metrics
-- **Llama-Guard** (8080) - Safety classifier
-- **Nomic-Embed** (9000) - Text embeddings
 - **PostgreSQL** - Databases for n8n and Langfuse
+
+### Serve through Ollama
+- **Lllama 3 8B Q4** - Primary generation model
+- **Llama-Guard** - Safety classifier
+- **Nomic-Embed** - Text embeddings
 
 ## Quick Start
 
@@ -41,4 +47,5 @@ A Docker Swarm stack configuration for AI automation and workflow management.
 - Qdrant: http://localhost:6333
 - Prometheus: http://localhost:9090
 
-Requires Ollama running on host for full functionality.
+> **Notice:**  
+> Requires Ollama running on host for full functionality.
