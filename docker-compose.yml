@@ -16,7 +16,7 @@ volumes:
   n8n_storage:
   qdrant_storage:
   langfuse_storage:
-  pgdata:
+  pgdata_n8n:
   pgdata_langfuse:
 
 # -----------------------------------------------------------------------------
@@ -27,22 +27,22 @@ secrets:
   n8n_basic_auth_password:    {file: ./secrets/n8n_pass}
   n8n_encryption_key:         {file: ./secrets/n8n_enc}
   langfuse_nextauth_secret:   {file: ./secrets/langfuse_nextauth}
-  postgres_password:          {file: ./secrets/postgres_pass}
+  postgres_n8n_password:          {file: ./secrets/postgres_n8n_pass}
   postgres_langfuse_password: {file: ./secrets/postgres_langfuse_pass}
 
 services:
   # ---------------------------------------------------------------------------
   # Postgres for n8n
   # ---------------------------------------------------------------------------
-  postgres:
+  postgres_n8n:
     image: postgres:17-alpine3.22
     environment:
       POSTGRES_USER: n8n
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_n8n_password
       POSTGRES_DB: n8n
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    secrets: [postgres_password]
+      - pgdata_n8n:/var/lib/postgresql/data
+    secrets: [postgres_n8n_password]
     networks: [internal]
     restart: unless-stopped
     healthcheck:
@@ -81,7 +81,7 @@ services:
     ports: ["5678:5678"]
     environment:
       DB_TYPE: postgres
-      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_HOST: postgres_n8n
       DB_POSTGRESDB_PORT: 5432
       DB_POSTGRESDB_DATABASE: n8n
       DB_POSTGRESDB_USER: n8n
@@ -95,7 +95,7 @@ services:
     volumes:
       - n8n_storage:/home/node/.n8n
     depends_on:
-      postgres: {condition: service_healthy}
+      postgres_n8n: {condition: service_healthy}
       qdrant:   {condition: service_healthy}
     secrets: [postgres_password]
     extra_hosts:
