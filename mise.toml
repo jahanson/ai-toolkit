@@ -14,7 +14,7 @@ run = "docker swarm init"
 
 [tasks."bootstrap:docker:deploy"]
 description = "Deploy the AI Toolkit stack to Docker Swarm."
-run = "docker stack deploy -c docker-compose.yml ai_toolkit"
+run = "docker stack deploy -c docker-compose.yml ai_toolkit --detach"
 alias = "deploy"
 
 [tasks."docker:swarm:remove"]
