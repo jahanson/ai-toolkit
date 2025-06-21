@@ -1,6 +1,6 @@
 # AI Toolkit
 
-A Docker Compose stack for AI automation and workflow management.
+A Docker Swarm stack configuration for AI automation and workflow management.
 
 ## Services
 
@@ -14,7 +14,7 @@ A Docker Compose stack for AI automation and workflow management.
 
 ## Quick Start
 
-1. Create secrets directory and files:
+1. Create the secrets:
    ```bash
    docker secret create n8n_basic_auth_user ./secrets/n8n_user
    docker secret create n8n_basic_auth_password ./secrets/n8n_pass
@@ -25,13 +25,13 @@ A Docker Compose stack for AI automation and workflow management.
    ```
 
 2. Create prometheus config:
-   ```bash
-   # Create basic prometheus.yml in project root
+   ```yaml
+   # TODO: Create basic prometheus.yml in project root
    ```
 
-3. Start the stack:
+3. Initialize the swarm: 
    ```bash
-   docker compose up -d
+   docker swarm init
    ```
 
 ## Access
