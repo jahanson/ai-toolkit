@@ -1,12 +1,26 @@
 [tasks."bootstrap:secrets"]
 description = "Bootstrap secrets for the AI Toolkit using 1Password CLI."
-   run = """
-   op read op://ai-toolkit/n8n_basic_auth_password/password | docker secret create n8n_basic_auth_password -
-   op read op://ai-toolkit/n8n_encryption_key/password | docker secret create n8n_encryption_key -
-   op read op://ai-toolkit/langfuse_nextauth_secret/password | docker secret create langfuse_nextauth_secret -
-   op read op://ai-toolkit/postgres_n8n_password/password | docker secret create postgres_n8n_password -
-   op read op://ai-toolkit/postgres_langfuse_password/password | docker secret create postgres_langfuse_password -
-  """
+run = """
+  op read op://ai-toolkit/n8n_basic_auth_password/password | docker secret create n8n_basic_auth_password -
+  op read op://ai-toolkit/n8n_encryption_key/password | docker secret create n8n_encryption_key -
+  op read op://ai-toolkit/langfuse_nextauth_secret/password | docker secret create langfuse_nextauth_secret -
+  op read op://ai-toolkit/postgres_n8n_password/password | docker secret create postgres_n8n_password -
+  op read op://ai-toolkit/postgres_langfuse_password/password | docker secret create postgres_langfuse_password -
+"""
+
+[tasks."bootstrap:docker:swarm"]
+description = "Bootstrap Docker Swarm for the AI Toolkit."
+run = "docker swarm init"
+
+[tasks."bootstrap:docker:deploy"]
+description = "Deploy the AI Toolkit stack to Docker Swarm."
+run = "docker stack deploy -c docker-compose.yml ai_toolkit"
+alias = "deploy"
+
+[tasks."docker:swarm:remove"]
+description = "Nuke the AI Toolkit environment. (Minus volumes)"
+run = "docker stack rm ai_toolkit"
+alias = "down"
 
 [tools]
 1password-cli = "latest"
