@@ -1,0 +1,12 @@
+[tasks."bootstrap:secrets"]
+description = "Bootstrap secrets for the AI Toolkit using 1Password CLI."
+   run = """
+   op read op://ai-toolkit/n8n_basic_auth_password/password | docker secret create n8n_basic_auth_password -
+   op read op://ai-toolkit/n8n_encryption_key/password | docker secret create n8n_encryption_key -
+   op read op://ai-toolkit/langfuse_nextauth_secret/password | docker secret create langfuse_nextauth_secret -
+   op read op://ai-toolkit/postgres_n8n_password/password | docker secret create postgres_n8n_password -
+   op read op://ai-toolkit/postgres_langfuse_password/password | docker secret create postgres_langfuse_password -
+  """
+
+[tools]
+1password-cli = "latest"
