@@ -40,10 +40,21 @@ A Docker Swarm stack configuration for AI automation and workflow management.
 
 ## Access
 
-- n8n: http://localhost:5678
-- Langfuse: http://localhost:3000  
-- Qdrant: http://localhost:6333
-- Prometheus: http://localhost:9090
+### Core Services
+- **n8n**: http://localhost:5678
+  - Username/password: Use credentials from 1Password vault (`n8n_basic_auth_user` and `n8n_basic_auth_password`)
+- **Langfuse**: http://localhost:3000
+  - First-time setup: Create admin account on first visit
+- **Qdrant**: http://localhost:6333
+  - Web UI and API access
+- **Prometheus**: http://localhost:9090
+  - Metrics dashboard
+- **ClickHouse**: http://localhost:8123
+  - HTTP interface for queries and management
+
+### Dashboard
+- **Homepage**: http://localhost:3001
+  - Pre-configured for service discovery.
 
 > **Notice:**  
 > Requires Ollama running on host for full functionality.
