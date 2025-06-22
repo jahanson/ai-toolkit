@@ -158,7 +158,7 @@ services:
   # ClickHouse – for Langfuse analytics
   # ---------------------------------------------------------------------------
   clickhouse:
-    image: clickhouse/clickhouse-server:24.3.3.102-alpine
+    image: clickhouse/clickhouse-server:24.12.6.70-alpine
     environment:
       CLICKHOUSE_DB: langfuse
       CLICKHOUSE_USER: langfuse
