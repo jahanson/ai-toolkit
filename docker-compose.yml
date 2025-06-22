@@ -177,7 +177,7 @@ services:
   # ClickHouse – for Langfuse analytics
   # ---------------------------------------------------------------------------
   clickhouse:
-    image: clickhouse/clickhouse-server:24.12.6.70-alpine
+    image: clickhouse/clickhouse-server:25.5.3.75-alpine
     ports:
       - "9000:9000" # TCP port for migrations
       - "8123:8123" # HTTP port for queries
