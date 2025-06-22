@@ -22,27 +22,21 @@ A Docker Swarm stack configuration for AI automation and workflow management.
 ## Quick Start
 
 1. Create the secrets retrieving them from 1password:
-   ```bash
+```bash
    mise run "bootstrap:secrets"
-   # OR
-   op read op://ai-toolkit/n8n_basic_auth_user/password | docker secret create n8n_basic_auth_user -
-   op read op://ai-toolkit/n8n_basic_auth_password/password | docker secret create n8n_basic_auth_password -
-   op read op://ai-toolkit/n8n_encryption_key/password | docker secret create n8n_encryption_key -
-   op read op://ai-toolkit/langfuse_nextauth_secret/password | docker secret create langfuse_nextauth_secret -
-   op read op://ai-toolkit/postgres_n8n_password/password | docker secret create postgres_n8n_password -
-   op read op://ai-toolkit/postgres_langfuse_password/password | docker secret create postgres_langfuse_password -
-   op read op://ai-toolkit/clickhouse_password/password | docker secret create clickhouse_password -
-   ```
+```
 
-2. Create prometheus config:
-   ```yaml
-   # TODO: Create basic prometheus.yml in project root
-   ```
+2. Pull the models
+```bash
+   ollama pull llama3:8b
+   ollama pull llama-guard3:8b
+   ollama pull nomic-embed-text:latest
+```
 
 3. Initialize the swarm: 
-   ```bash
+```bash
    docker swarm init
-   ```
+```
 
 ## Access
 
