@@ -12,6 +12,7 @@ A Docker Swarm stack configuration for AI automation and workflow management.
 - **Qdrant** (6333) - Vector database
 - **Prometheus** (9090) - Metrics
 - **PostgreSQL** - Databases for n8n and Langfuse
+- **ClickHouse** (8123) - Analytics database
 
 ### Serve through Ollama
 - **Lllama 3 8B Q4** - Primary generation model
@@ -30,6 +31,7 @@ A Docker Swarm stack configuration for AI automation and workflow management.
    op read op://ai-toolkit/langfuse_nextauth_secret/password | docker secret create langfuse_nextauth_secret -
    op read op://ai-toolkit/postgres_n8n_password/password | docker secret create postgres_n8n_password -
    op read op://ai-toolkit/postgres_langfuse_password/password | docker secret create postgres_langfuse_password -
+   op read op://ai-toolkit/clickhouse_password/password | docker secret create clickhouse_password -
    ```
 
 2. Create prometheus config:
