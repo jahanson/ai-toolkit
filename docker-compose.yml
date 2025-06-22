@@ -100,7 +100,7 @@ services:
       N8N_BASIC_AUTH_PASSWORD_FILE: /run/secrets/n8n_basic_auth_password
       N8N_ENCRYPTION_KEY_FILE: /run/secrets/n8n_encryption_key
       N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
-      N8N_METRICS: "false"
+      N8N_METRICS: "true"
       N8N_PERSONALIZATION_ENABLED: "false"
       N8N_VERSION_NOTIFICATIONS_ENABLED: "false"
       N8N_DIAGNOSTICS_ENABLED: "false"
@@ -117,6 +117,9 @@ services:
       - postgres_n8n_password
     extra_hosts:
       - "host.docker.internal:host-gateway" # reach host‑side Ollama
+    healthcheck:
+      <<: *default-healthcheck
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz/readiness" ]
     entrypoint: >
       sh -c '
         export DB_POSTGRESDB_PASSWORD="$$(cat /run/secrets/postgres_n8n_password)" &&
