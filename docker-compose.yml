@@ -36,6 +36,8 @@ secrets:
     external: true
   postgres_langfuse_password:
     external: true
+  clickhouse_password:
+    external: true
 
 services:
   # ---------------------------------------------------------------------------
@@ -161,9 +163,14 @@ services:
       CLICKHOUSE_DB: langfuse
       CLICKHOUSE_USER: langfuse
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
-      CLICKHOUSE_PASSWORD: langfuse_clickhouse_password
     volumes:
       - clickhouse_data:/var/lib/clickhouse
+    secrets:
+      - clickhouse_password
+    entrypoint: >
+      sh -c '
+        export CLICKHOUSE_PASSWORD="$$(cat /run/secrets/clickhouse_password)" &&
+        exec /entrypoint.sh'
     networks: [internal]
     deploy:
       resources:
@@ -179,7 +186,6 @@ services:
       NEXTAUTH_SECRET_FILE: /run/secrets/langfuse_nextauth_secret
       NEXTAUTH_URL: http://localhost:3000
       NODE_ENV: production
-      CLICKHOUSE_URL: clickhouse://langfuse:langfuse_clickhouse_password@clickhouse:8123/langfuse
       LANGFUSE_DEFAULT_PROJECT_ROLE: "ADMIN"
       LANGFUSE_DEFAULT_PROJECT_ID: "default"
     volumes:
@@ -187,6 +193,7 @@ services:
     secrets:
       - langfuse_nextauth_secret
       - postgres_langfuse_password
+      - clickhouse_password
     depends_on:
       - postgres_langfuse
       - clickhouse
@@ -194,9 +201,11 @@ services:
       - "host.docker.internal:host-gateway"  # reach host‑side Ollama
     entrypoint: >
       sh -c '
-        PASSWORD=$$(cat /run/secrets/postgres_langfuse_password) &&
-        export DATABASE_URL="postgres://langfuse:$$PASSWORD@postgres_langfuse:5432/langfuse" &&
-        echo "DATABASE_URL set successfully" &&
+        PG_PASSWORD=$$(cat /run/secrets/postgres_langfuse_password) &&
+        CH_PASSWORD=$$(cat /run/secrets/clickhouse_password) &&
+        export DATABASE_URL="postgres://langfuse:$$PG_PASSWORD@postgres_langfuse:5432/langfuse" &&
+        export CLICKHOUSE_URL="clickhouse://langfuse:$$CH_PASSWORD@clickhouse:8123/langfuse" &&
+        echo "DATABASE_URL and CLICKHOUSE_URL set successfully" &&
         exec dumb-init -- ./web/entrypoint.sh'
     networks: [internal]
     deploy:
