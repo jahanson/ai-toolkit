@@ -18,6 +18,7 @@ volumes:
   langfuse_storage:
   pgdata_n8n:
   pgdata_langfuse:
+  clickhouse_data:
 
 # -----------------------------------------------------------------------------
 # Docker Secrets – keep credentials out of the compose file.
@@ -130,9 +131,6 @@ services:
     volumes:
       - qdrant_storage:/qdrant/storage
     networks: [internal]
-    healthcheck:
-      <<: *default-healthcheck
-      test: ["CMD", "curl", "-fsSL", "http://localhost:6333/healthz"]
     deploy:
       resources:
         limits: {cpus: "2.0", memory: 4g}
@@ -155,6 +153,23 @@ services:
         limits: {cpus: "1.0", memory: 1g}
 
   # ---------------------------------------------------------------------------
+  # ClickHouse – for Langfuse analytics
+  # ---------------------------------------------------------------------------
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3.3.102-alpine
+    environment:
+      CLICKHOUSE_DB: langfuse
+      CLICKHOUSE_USER: langfuse
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+      CLICKHOUSE_PASSWORD: langfuse_clickhouse_password
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    networks: [internal]
+    deploy:
+      resources:
+        limits: {cpus: "1.0", memory: 2g}
+
+  # ---------------------------------------------------------------------------
   # Langfuse – LLM observability
   # ---------------------------------------------------------------------------
   langfuse:
@@ -164,6 +179,9 @@ services:
       NEXTAUTH_SECRET_FILE: /run/secrets/langfuse_nextauth_secret
       NEXTAUTH_URL: http://localhost:3000
       NODE_ENV: production
+      CLICKHOUSE_URL: clickhouse://langfuse:langfuse_clickhouse_password@clickhouse:8123/langfuse
+      LANGFUSE_DEFAULT_PROJECT_ROLE: "ADMIN"
+      LANGFUSE_DEFAULT_PROJECT_ID: "default"
     volumes:
       - langfuse_storage:/data
     secrets:
@@ -171,16 +189,16 @@ services:
       - postgres_langfuse_password
     depends_on:
       - postgres_langfuse
+      - clickhouse
     extra_hosts:
       - "host.docker.internal:host-gateway"  # reach host‑side Ollama
     entrypoint: >
-      /bin/sh -c '
-        export DATABASE_URL="postgres://langfuse:$$(cat /run/secrets/postgres_langfuse_password)@postgres_langfuse:5432/langfuse";
-        exec /entrypoint.sh'
+      sh -c '
+        PASSWORD=$$(cat /run/secrets/postgres_langfuse_password) &&
+        export DATABASE_URL="postgres://langfuse:$$PASSWORD@postgres_langfuse:5432/langfuse" &&
+        echo "DATABASE_URL set successfully" &&
+        exec dumb-init -- ./web/entrypoint.sh'
     networks: [internal]
-    healthcheck:
-      <<: *default-healthcheck
-      test: ["CMD", "curl", "-fsSL", "http://localhost:3000/api/health"]
     deploy:
       resources:
         limits: {cpus: "1.0", memory: 2g}
