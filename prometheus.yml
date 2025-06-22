@@ -55,8 +55,3 @@ scrape_configs:
   - job_name: "qdrant"
     static_configs:
       - targets: ["qdrant:6333"]
-
-  # Example: Scrape Ollama Monitor (if you run a Prometheus exporter for Ollama on port 8000)
-  - job_name: "ollama-monitor"
-    static_configs:
-      - targets: ["ollama-monitor:8000"]
