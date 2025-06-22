@@ -18,11 +18,23 @@ run = "docker swarm init"
 description = "Deploy the AI Toolkit stack to Docker Swarm."
 run = "docker stack deploy -c docker-compose.yml ai_toolkit --detach"
 alias = "deploy"
+wait_for = "docker:swarm:remove"
 
 [tasks."docker:swarm:remove"]
 description = "Nuke the AI Toolkit environment. (Minus volumes)"
 run = "docker stack rm ai_toolkit"
 alias = "down"
+
+[tasks."docker:prune"]
+description = "Prune unused Docker resources (containers, networks, images)"
+run = "docker system prune -f"
+alias = "prune"
+
+[tasks."bounce"]
+description = "Bounce the AI Toolkit stack."
+depends = ["docker:swarm:remove"]
+run = "./scripts/check-removing.sh"
+depends_post = ["bootstrap:docker:deploy"]
 
 [tools]
 1password-cli = "latest"
