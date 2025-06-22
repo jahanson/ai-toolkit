@@ -7,6 +7,7 @@ run = """
   op read op://ai-toolkit/postgres_n8n_password/password | docker secret create postgres_n8n_password -
   op read op://ai-toolkit/postgres_langfuse_password/password | docker secret create postgres_langfuse_password -
   op read op://ai-toolkit/clickhouse_password/password | docker secret create clickhouse_password -
+  op read op://ai-toolkit/langfuse_salt/password | docker secret create langfuse_salt -
 """
 
 [tasks."bootstrap:docker:swarm"]
