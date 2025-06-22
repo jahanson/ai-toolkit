@@ -1,0 +1,17 @@
+---
+# Homepage Services Configuration
+# https://gethomepage.dev/configs/services/
+
+- Monitoring:
+    - Prometheus:
+        href: http://localhost:9090
+        description: Metrics collection and monitoring
+        icon: prometheus.png
+        widget:
+          type: prometheus
+          url: http://prometheus:9090
+
+    - ClickHouse:
+        href: http://localhost:8123
+        description: Analytics database
+        icon: clickhouse.png

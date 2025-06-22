@@ -3,9 +3,9 @@
 # -----------------------------------------------------------------------------
 
 x-healthcheck: &default-healthcheck
-  interval: 30s    # probe every 30 seconds
-  timeout: 3s      # mark failure if response >3 s
-  retries: 3       # need 3 failures to go unhealthy
+  interval: 30s # probe every 30 seconds
+  timeout: 3s # mark failure if response >3 s
+  retries: 3 # need 3 failures to go unhealthy
   start_period: 10s # grace period after container start
 
 networks:
@@ -53,14 +53,14 @@ services:
       POSTGRES_DB: n8n
     volumes:
       - pgdata_n8n:/var/lib/postgresql/data
-    secrets: [postgres_n8n_password]
-    networks: [internal]
+    secrets: [ postgres_n8n_password ]
+    networks: [ internal ]
     healthcheck:
       <<: *default-healthcheck
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER" ]
     deploy:
       resources:
-        limits: {cpus: "1.0", memory: 2g}
+        limits: { cpus: "1.0", memory: 2g }
 
   # ---------------------------------------------------------------------------
   # Postgres for Langfuse
@@ -73,22 +73,22 @@ services:
       POSTGRES_DB: langfuse
     volumes:
       - pgdata_langfuse:/var/lib/postgresql/data
-    secrets: [postgres_langfuse_password]
-    networks: [internal]
+    secrets: [ postgres_langfuse_password ]
+    networks: [ internal ]
     healthcheck:
       <<: *default-healthcheck
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER" ]
     deploy:
       resources:
-        limits: {cpus: "1.0", memory: 2g}
+        limits: { cpus: "1.0", memory: 2g }
 
   # ---------------------------------------------------------------------------
   # n8n – workflow automation
   # ---------------------------------------------------------------------------
   n8n:
     image: n8nio/n8n:1.99.1
-    ports: ["5678:5678"]
-    
+    ports: [ "5678:5678" ]
+
     environment:
       DB_TYPE: postgresdb
       DB_POSTGRESDB_HOST: postgres_n8n
@@ -116,45 +116,62 @@ services:
       - n8n_encryption_key
       - postgres_n8n_password
     extra_hosts:
-      - "host.docker.internal:host-gateway"  # reach host‑side Ollama
+      - "host.docker.internal:host-gateway" # reach host‑side Ollama
     entrypoint: >
       sh -c '
         export DB_POSTGRESDB_PASSWORD="$$(cat /run/secrets/postgres_n8n_password)" &&
         exec tini -- n8n'
-    networks: [internal]
+    networks: [ internal ]
     deploy:
+      labels:
+        homepage.group: AI Toolkit
+        homepage.name: n8n
+        homepage.icon: n8n.png
+        homepage.href: http://localhost:5678
+        homepage.description: Workflow automation platform
       resources:
-        limits: {cpus: "1.0", memory: 1g}
+        limits: { cpus: "1.0", memory: 1g }
 
   # ---------------------------------------------------------------------------
   # Qdrant – vector database
   # ---------------------------------------------------------------------------
   qdrant:
     image: qdrant/qdrant:v1.14.1
-    ports: ["6333:6333"]
+    ports: [ "6333:6333" ]
     volumes:
       - qdrant_storage:/qdrant/storage
-    networks: [internal]
+    networks: [ internal ]
     deploy:
+      labels:
+        homepage.group: AI Toolkit
+        homepage.name: Qdrant
+        homepage.icon: /images/qdrant.svg
+        homepage.href: http://localhost:6333
+        homepage.description: Vector database
       resources:
-        limits: {cpus: "2.0", memory: 4g}
-
+        limits: { cpus: "2.0", memory: 4g }
 
   # ---------------------------------------------------------------------------
   # Prometheus – metrics scraper
   # ---------------------------------------------------------------------------
   prometheus:
     image: prom/prometheus:v3.4.1
-    ports: ["9090:9090"]
+    ports: [ "9090:9090" ]
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    networks: [internal]
+    networks: [ internal ]
     healthcheck:
       <<: *default-healthcheck
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy" ]
     deploy:
+      labels:
+        homepage.group: AI Toolkit
+        homepage.name: Prometheus
+        homepage.icon: prometheus.png
+        homepage.href: http://localhost:9090
+        homepage.description: Metrics collection and monitoring
       resources:
-        limits: {cpus: "1.0", memory: 1g}
+        limits: { cpus: "1.0", memory: 1g }
 
   # ---------------------------------------------------------------------------
   # ClickHouse – for Langfuse analytics
@@ -162,8 +179,8 @@ services:
   clickhouse:
     image: clickhouse/clickhouse-server:24.12.6.70-alpine
     ports:
-      - "9000:9000"  # TCP port for migrations
-      - "8123:8123"  # HTTP port for queries
+      - "9000:9000" # TCP port for migrations
+      - "8123:8123" # HTTP port for queries
     environment:
       CLICKHOUSE_DB: langfuse
       CLICKHOUSE_USER: langfuse
@@ -176,17 +193,23 @@ services:
       sh -c '
         export CLICKHOUSE_PASSWORD="$$(cat /run/secrets/clickhouse_password)" &&
         exec /entrypoint.sh'
-    networks: [internal]
+    networks: [ internal ]
     deploy:
+      labels:
+        homepage.group: AI Toolkit
+        homepage.name: ClickHouse
+        homepage.icon: clickhouse.png
+        homepage.href: http://localhost:8123
+        homepage.description: Analytics database for Langfuse
       resources:
-        limits: {cpus: "1.0", memory: 2g}
+        limits: { cpus: "1.0", memory: 2g }
 
   # ---------------------------------------------------------------------------
   # Langfuse – LLM observability
   # ---------------------------------------------------------------------------
   langfuse:
     image: langfuse/langfuse:3.73.1
-    ports: ["3000:3000"]
+    ports: [ "3000:3000" ]
     environment:
       NEXTAUTH_URL: http://localhost:3000
       NODE_ENV: production
@@ -203,7 +226,7 @@ services:
     depends_on:
       - postgres_langfuse
     extra_hosts:
-      - "host.docker.internal:host-gateway"  # reach host‑side Ollama
+      - "host.docker.internal:host-gateway" # reach host‑side Ollama
     entrypoint: >
       sh -c '
         echo "Reading secrets..." &&
@@ -227,7 +250,40 @@ services:
         else
           exec node ./web/server.js --keepAliveTimeout 110000
         fi'
-    networks: [internal]
+    networks: [ internal ]
     deploy:
+      labels:
+        homepage.group: AI Toolkit
+        homepage.name: Langfuse
+        homepage.icon: /images/langfuse.svg
+        homepage.href: http://localhost:3000
+        homepage.description: LLM observability and tracing
       resources:
-        limits: {cpus: "1.0", memory: 2g}
+        limits: { cpus: "1.0", memory: 2g }
+
+  # ---------------------------------------------------------------------------
+  # Dashboard Services - Compare different dashboard solutions
+  # ---------------------------------------------------------------------------
+
+  # Homepage - Modern, customizable dashboard
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    ports: [ "3001:3000" ]
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: "localhost:3001,127.0.0.1:3001"
+    volumes:
+      - ./apps/homepage/services.yaml:/app/config/services.yaml:ro
+      - ./apps/homepage/widgets.yaml:/app/config/widgets.yaml:ro
+      - ./apps/homepage/settings.yaml:/app/config/settings.yaml:ro
+      - ./apps/homepage/docker.yaml:/app/config/docker.yaml:ro
+      - ./apps/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro
+      - ./assets:/app/public/images:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: [ internal ]
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits: { cpus: "0.5", memory: 512m }
+

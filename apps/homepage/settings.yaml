@@ -1,0 +1,33 @@
+---
+# Homepage Settings Configuration
+# https://gethomepage.dev/configs/settings/
+
+title: AI Toolkit Dashboard
+favicon: /assets/logo.png
+
+theme: dark
+color: slate
+
+headerStyle: boxed
+hideVersion: false
+
+layout:
+  AI Toolkit:
+    style: row
+    columns: 2
+  Monitoring:
+    style: row
+    columns: 2
+  Dashboard Comparison:
+    style: row
+    columns: 3
+
+providers:
+  docker:
+    socket: /var/run/docker.sock
+    swarm: true
+
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: false
+  hideVisitURL: false

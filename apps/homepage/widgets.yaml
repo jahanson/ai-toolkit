@@ -1,0 +1,30 @@
+---
+# Homepage Widgets Configuration
+# https://gethomepage.dev/widgets/
+
+- logo:
+    icon: /images/logo.png
+
+- greeting:
+    text_size: xl
+    text: "AI Toolkit Dashboard"
+
+- search:
+    provider: custom
+    url: https://kagi.com/search?q=
+    suggestionUrl: https://kagi.com/api/autosuggest?q=
+    target: _blank
+    showSearchSuggestions: true
+
+- resources:
+    cpu: true
+    memory: true
+    disk: /
+    expanded: true
+
+- datetime:
+    text_size: l
+    format:
+      timeStyle: short
+      dateStyle: short
+      hour12: true
