@@ -307,6 +307,9 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
     networks: [ internal ]
+    healthcheck:
+      <<: *default-healthcheck
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080/healthz" ]
     deploy:
       mode: global
       placement:
