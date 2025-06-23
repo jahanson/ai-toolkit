@@ -294,7 +294,7 @@ services:
   # cAdvisor - Container resource usage and performance analysis
   # ---------------------------------------------------------------------------
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    image: gcr.io/cadvisor/cadvisor:v0.52.1
     ports:
       - target: 8080
         published: 50131
