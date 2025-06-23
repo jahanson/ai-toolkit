@@ -11,6 +11,7 @@ A Docker Swarm stack configuration for AI automation and workflow management.
 - **Langfuse** (3000) - LLM observability  
 - **Qdrant** (6333) - Vector database
 - **Prometheus** (9090) - Metrics
+- **cAdvisor** (50131) - Container resource monitoring
 - **PostgreSQL** - Databases for n8n and Langfuse
 - **ClickHouse** (8123) - Analytics database
 
@@ -49,6 +50,8 @@ A Docker Swarm stack configuration for AI automation and workflow management.
   - Web UI and API access
 - **Prometheus**: http://localhost:9090
   - Metrics dashboard
+- **cAdvisor**: http://localhost:50131
+  - Container resource usage and performance monitoring
 - **ClickHouse**: http://localhost:8123
   - HTTP interface for queries and management
 
