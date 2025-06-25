@@ -211,7 +211,7 @@ services:
   # Langfuse – LLM observability
   # ---------------------------------------------------------------------------
   langfuse:
-    image: langfuse/langfuse:3.73.1
+    image: langfuse/langfuse:3.74.0
     ports: [ "3000:3000" ]
     environment:
       NEXTAUTH_URL: http://localhost:3000
